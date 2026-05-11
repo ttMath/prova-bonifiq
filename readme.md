@@ -102,7 +102,7 @@ Você pode utilizar qualquer framework de testes que desejar.
 ## Como entregar
 Oba! Terminou tudinho? Agora faça o seguinte:
 1. Faça ```push``` para seu repositório (sim, aquele que você criou lá em cima. Nada de fork).
-2. Forneça acesso ao repositório no GitHub para o usuário ```sandercamargo```
+2. Forneça acesso ao repositório no GitHub para os usuários ```sandercamargo``` e ```michellcamposbonifiq```
 2. Preencha o formulário abaixo:
 [https://forms.gle/mHipmDJJnij7FRHE7](https://forms.gle/mHipmDJJnij7FRHE7)
 
