@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProvaPub.Models;
-using ProvaPub.Services;
+using ProvaPub.Services.Interfaces;
 
 namespace ProvaPub.Controllers
 {
@@ -16,10 +16,10 @@ namespace ProvaPub.Controllers
 		/// Como você faria pra criar uma estrutura melhor, com menos repetição de código? E quanto ao CustomerService/ProductService. Você acha que seria possível evitar a repetição de código?
 		///
 		/// </summary>
-		private readonly ProductService _productService;
+		private readonly IProductService _productService;
 		private readonly ICustomerService _customerService;
 
-		public Parte2Controller(ProductService productService, ICustomerService customerService)
+		public Parte2Controller(IProductService productService, ICustomerService customerService)
 		{
 			_productService = productService;
 			_customerService = customerService;

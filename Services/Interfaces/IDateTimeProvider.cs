@@ -1,4 +1,4 @@
-namespace ProvaPub.Services
+namespace ProvaPub.Services.Interfaces
 {
 	public interface IDateTimeProvider
 	{

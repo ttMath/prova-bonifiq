@@ -3,7 +3,7 @@ using ProvaPub.Infra;
 using ProvaPub.Repositories;
 using ProvaPub.Repositories.Interfaces;
 using ProvaPub.Services;
-using ProvaPub.Services.Payments;
+using ProvaPub.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,13 +16,16 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<TestDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("ctx")));
-builder.Services.AddScoped<RandomService>();
-builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<IRandomRepository, RandomRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IDateTimeProvider, DateTimeProvider>();
+builder.Services.AddScoped<IRandomService, RandomService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
-builder.Services.AddScoped<OrderService>();
-builder.Services.AddScoped<BrazilianDateTimeService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IBrazilianDateTimeService, BrazilianDateTimeService>();
 foreach (var paymentProcessor in typeof(IPaymentProcessor).Assembly.GetTypes()
 	.Where(type => !type.IsAbstract && !type.IsInterface && typeof(IPaymentProcessor).IsAssignableFrom(type)))
 {

@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using ProvaPub.Infra;
 
-namespace ProvaPub.Services
+namespace ProvaPub.Repositories
 {
-	public abstract class PagedService<T> where T : class
+	public abstract class PagedRepository<T> where T : class
 	{
 		private const int PageSize = 10;
 		protected readonly TestDbContext _ctx;
 
-		protected PagedService(TestDbContext ctx)
+		protected PagedRepository(TestDbContext ctx)
 		{
 			_ctx = ctx;
 		}

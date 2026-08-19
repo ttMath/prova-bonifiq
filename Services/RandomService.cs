@@ -1,18 +1,17 @@
-using Microsoft.EntityFrameworkCore;
-using ProvaPub.Infra;
-using ProvaPub.Models;
+using ProvaPub.Repositories.Interfaces;
+using ProvaPub.Services.Interfaces;
 using System.Security.Cryptography;
 
 namespace ProvaPub.Services
 {
-	public class RandomService
+	public class RandomService : IRandomService
 	{
 		private static readonly SemaphoreSlim Semaphore = new(1, 1);
-		private readonly TestDbContext _ctx;
+		private readonly IRandomRepository _randomRepository;
 
-		public RandomService(TestDbContext ctx)
+		public RandomService(IRandomRepository randomRepository)
 		{
-			_ctx = ctx;
+			_randomRepository = randomRepository;
 		}
 
 		public async Task<int> GetRandom()
@@ -27,10 +26,9 @@ namespace ProvaPub.Services
 				{
 					number = RandomNumberGenerator.GetInt32(1, int.MaxValue);
 				}
-				while (await _ctx.Numbers.AnyAsync(x => x.Number == number));
+				while (await _randomRepository.ExistsNumber(number));
 
-				_ctx.Numbers.Add(new RandomNumber() { Number = number });
-				await _ctx.SaveChangesAsync();
+				await _randomRepository.AddNumber(number);
 
 				return number;
 			}

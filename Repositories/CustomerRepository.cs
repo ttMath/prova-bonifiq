@@ -2,11 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using ProvaPub.Infra;
 using ProvaPub.Models;
 using ProvaPub.Repositories.Interfaces;
-using ProvaPub.Services;
 
 namespace ProvaPub.Repositories
 {
-	public class CustomerRepository : PagedService<Customer>, ICustomerRepository
+	public class CustomerRepository : PagedRepository<Customer>, ICustomerRepository
 	{
 		public CustomerRepository(TestDbContext ctx)
 			: base(ctx)

@@ -1,6 +1,7 @@
 using ProvaPub.Models;
 using ProvaPub.Repositories.Interfaces;
 using ProvaPub.Services;
+using ProvaPub.Services.Interfaces;
 using Xunit;
 
 namespace ProvaPub.Tests

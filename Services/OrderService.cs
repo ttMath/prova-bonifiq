@@ -1,27 +1,29 @@
-using Microsoft.EntityFrameworkCore;
-using ProvaPub.Infra;
 using ProvaPub.Models;
-using ProvaPub.Services.Payments;
+using ProvaPub.Repositories.Interfaces;
+using ProvaPub.Services.Interfaces;
 
 namespace ProvaPub.Services
 {
-	public class OrderService
+	public class OrderService : IOrderService
 	{
-		private readonly TestDbContext _ctx;
+		private readonly IOrderRepository _orderRepository;
 		private readonly ICustomerService _customerService;
 		private readonly IEnumerable<IPaymentProcessor> _paymentProcessors;
-		private readonly BrazilianDateTimeService _brazilianDateTimeService;
+		private readonly IBrazilianDateTimeService _brazilianDateTimeService;
+		private readonly IDateTimeProvider _dateTimeProvider;
 
 		public OrderService(
-			TestDbContext ctx,
+			IOrderRepository orderRepository,
 			ICustomerService customerService,
 			IEnumerable<IPaymentProcessor> paymentProcessors,
-			BrazilianDateTimeService brazilianDateTimeService)
+			IBrazilianDateTimeService brazilianDateTimeService,
+			IDateTimeProvider dateTimeProvider)
 		{
-			_ctx = ctx;
+			_orderRepository = orderRepository;
 			_customerService = customerService;
 			_paymentProcessors = paymentProcessors;
 			_brazilianDateTimeService = brazilianDateTimeService;
+			_dateTimeProvider = dateTimeProvider;
 		}
 
 		public async Task<Order> PayOrder(string paymentMethod, decimal paymentValue, int customerId)
@@ -32,6 +34,7 @@ namespace ProvaPub.Services
 			if (paymentValue <= 0)
 				throw new ArgumentOutOfRangeException(nameof(paymentValue));
 
+			var customer = await _customerService.GetCustomerById(customerId);
 
 			var paymentProcessor = _paymentProcessors.FirstOrDefault(x =>
 				x.PaymentMethod.Equals(paymentMethod, StringComparison.OrdinalIgnoreCase));
@@ -45,12 +48,9 @@ namespace ProvaPub.Services
 			{
 				CustomerId = customerId,
 				Value = paymentValue,
-				OrderDate = DateTime.UtcNow
+				OrderDate = _dateTimeProvider.UtcNow
 			});
-			
-			var customer = await _customerService.GetCustomerById(customerId);
 
-			_ctx.Entry(order).State = EntityState.Detached;
 			order.Customer = customer;
 			order.OrderDate = _brazilianDateTimeService.FromUtc(order.OrderDate);
 
@@ -59,14 +59,7 @@ namespace ProvaPub.Services
 
 		public async Task<Order> InsertOrder(Order order)
 		{
-			order.OrderDate = order.OrderDate == default
-				? DateTime.UtcNow
-				: order.OrderDate.ToUniversalTime();
-
-			var entity = (await _ctx.Orders.AddAsync(order)).Entity;
-			await _ctx.SaveChangesAsync();
-
-			return entity;
+			return await _orderRepository.InsertOrder(order);
 		}
 	}
 }

@@ -1,6 +1,8 @@
+using ProvaPub.Services.Interfaces;
+
 namespace ProvaPub.Services
 {
-	public class BrazilianDateTimeService
+	public class BrazilianDateTimeService : IBrazilianDateTimeService
 	{
 		private readonly TimeZoneInfo _timeZone = GetTimeZone();
 
