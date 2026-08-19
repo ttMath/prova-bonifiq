@@ -17,14 +17,26 @@ namespace ProvaPub.Services
 			return new CustomerList(result.Items, result.TotalCount, result.HasNext);
 		}
 
+		public async Task<Customer> GetCustomerById(int customerId)
+		{
+			if (customerId <= 0)
+				throw new ArgumentOutOfRangeException(nameof(customerId));
+
+			var customer = await _ctx.Customers
+				.AsNoTracking()
+				.FirstOrDefaultAsync(x => x.Id == customerId);
+
+			if (customer == null)
+				throw new InvalidOperationException($"Customer Id {customerId} does not exists");
+
+			return customer;
+		}
+
 		public async Task<bool> CanPurchase(int customerId, decimal purchaseValue)
 		{
-			if (customerId <= 0) throw new ArgumentOutOfRangeException(nameof(customerId));
-
 			if (purchaseValue <= 0) throw new ArgumentOutOfRangeException(nameof(purchaseValue));
 
-			var customer = await _ctx.Customers.FindAsync(customerId);
-			if (customer == null) throw new InvalidOperationException($"Customer Id {customerId} does not exists");
+			await GetCustomerById(customerId);
 
 			var baseDate = DateTime.UtcNow.AddMonths(-1);
 			var ordersInThisMonth = await _ctx.Orders.CountAsync(s => s.CustomerId == customerId && s.OrderDate >= baseDate);

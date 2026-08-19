@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using ProvaPub.Models;
-using ProvaPub.Repository;
 using ProvaPub.Services;
 
 namespace ProvaPub.Controllers
@@ -18,18 +16,22 @@ namespace ProvaPub.Controllers
     /// </summary>
     [ApiController]
 	[Route("[controller]")]
-	public class Parte3Controller :  ControllerBase
+	public class Parte3Controller : ControllerBase
 	{
-		[HttpGet("orders")]
-		public async Task<Order> PlaceOrder(string paymentMethod, decimal paymentValue, int customerId)
+		private readonly OrderService _orderService;
+
+		public Parte3Controller(OrderService orderService)
 		{
-            var contextOptions = new DbContextOptionsBuilder<TestDbContext>()
-    .UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Teste;Trusted_Connection=True;")
-    .Options;
+			_orderService = orderService;
+		}
 
-            using var context = new TestDbContext(contextOptions);
+		[HttpPost("orders")]
+		public async Task<Response<Order>> PlaceOrder([FromBody] Request<OrderRequest> request)
+		{
+			var orderRequest = request.Data;
+			var order = await _orderService.PayOrder(orderRequest.PaymentMethod, orderRequest.PaymentValue, orderRequest.CustomerId);
 
-            return await new OrderService(context).PayOrder(paymentMethod, paymentValue, customerId);
+			return new Response<Order>(order);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProvaPub.Repository;
 using ProvaPub.Services;
+using ProvaPub.Services.Payments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,13 @@ builder.Services.AddDbContext<TestDbContext>(options =>
 builder.Services.AddScoped<RandomService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<BrazilianDateTimeService>();
+foreach (var paymentProcessor in typeof(IPaymentProcessor).Assembly.GetTypes()
+	.Where(type => !type.IsAbstract && !type.IsInterface && typeof(IPaymentProcessor).IsAssignableFrom(type)))
+{
+	builder.Services.AddScoped(typeof(IPaymentProcessor), paymentProcessor);
+}
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
