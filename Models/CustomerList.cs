@@ -1,9 +1,20 @@
-﻿namespace ProvaPub.Models
+namespace ProvaPub.Models
 {
-	public class CustomerList
+	public class CustomerList : PagedList<Customer>
 	{
-		public List<Customer> Customers { get; set; }
-		public int TotalCount { get; set; }
-		public bool HasNext { get; set; }
+		public CustomerList()
+		{
+		}
+
+		public CustomerList(List<Customer> customers, int totalCount, bool hasNext)
+			: base(customers, totalCount, hasNext)
+		{
+		}
+
+		public List<Customer> Customers
+		{
+			get => Items;
+			set => Items = value;
+		}
 	}
 }
