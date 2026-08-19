@@ -1,29 +1,41 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ProvaPub.Models;
-using ProvaPub.Repository;
+using ProvaPub.Repositories.Interfaces;
+using ProvaPub.Services.Interfaces;
+using System.Security.Cryptography;
 
 namespace ProvaPub.Services
 {
-	public class RandomService
+	public class RandomService : IRandomService
 	{
-		int seed;
-        TestDbContext _ctx;
-		public RandomService()
-        {
-            var contextOptions = new DbContextOptionsBuilder<TestDbContext>()
-    .UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Teste;Trusted_Connection=True;")
-    .Options;
-            seed = Guid.NewGuid().GetHashCode();
+		private static readonly SemaphoreSlim Semaphore = new(1, 1);
+		private readonly IRandomRepository _randomRepository;
 
-            _ctx = new TestDbContext(contextOptions);
-        }
-        public async Task<int> GetRandom()
+		public RandomService(IRandomRepository randomRepository)
 		{
-            var number =  new Random(seed).Next(100);
-            _ctx.Numbers.Add(new RandomNumber() { Number = number });
-            _ctx.SaveChanges();
-			return number;
+			_randomRepository = randomRepository;
 		}
 
+		public async Task<int> GetRandom()
+		{
+			await Semaphore.WaitAsync();
+
+			try
+			{
+				int number;
+
+				do
+				{
+					number = RandomNumberGenerator.GetInt32(1, int.MaxValue);
+				}
+				while (await _randomRepository.ExistsNumber(number));
+
+				await _randomRepository.AddNumber(number);
+
+				return number;
+			}
+			finally
+			{
+				Semaphore.Release();
+			}
+		}
 	}
 }
