@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace ProvaPub.Migrations
+namespace ProvaPub.Infra.Migrations
 {
     /// <inheritdoc />
     public partial class changes : Migration

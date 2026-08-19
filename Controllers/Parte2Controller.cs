@@ -17,9 +17,9 @@ namespace ProvaPub.Controllers
 		///
 		/// </summary>
 		private readonly ProductService _productService;
-		private readonly CustomerService _customerService;
+		private readonly ICustomerService _customerService;
 
-		public Parte2Controller(ProductService productService, CustomerService customerService)
+		public Parte2Controller(ProductService productService, ICustomerService customerService)
 		{
 			_productService = productService;
 			_customerService = customerService;

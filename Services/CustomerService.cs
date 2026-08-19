@@ -1,20 +1,22 @@
-using Microsoft.EntityFrameworkCore;
 using ProvaPub.Models;
-using ProvaPub.Repository;
+using ProvaPub.Repositories.Interfaces;
 
 namespace ProvaPub.Services
 {
-	public class CustomerService : PagedService<Customer>
+	public class CustomerService : ICustomerService
 	{
-		public CustomerService(TestDbContext ctx)
-			: base(ctx)
+		private readonly ICustomerRepository _customerRepository;
+		private readonly IDateTimeProvider _dateTimeProvider;
+
+		public CustomerService(ICustomerRepository customerRepository, IDateTimeProvider dateTimeProvider)
 		{
+			_customerRepository = customerRepository;
+			_dateTimeProvider = dateTimeProvider;
 		}
 
 		public CustomerList ListCustomers(int page)
 		{
-			var result = ListPage(_ctx.Customers, page);
-			return new CustomerList(result.Items, result.TotalCount, result.HasNext);
+			return _customerRepository.ListCustomers(page);
 		}
 
 		public async Task<Customer> GetCustomerById(int customerId)
@@ -22,9 +24,7 @@ namespace ProvaPub.Services
 			if (customerId <= 0)
 				throw new ArgumentOutOfRangeException(nameof(customerId));
 
-			var customer = await _ctx.Customers
-				.AsNoTracking()
-				.FirstOrDefaultAsync(x => x.Id == customerId);
+			var customer = await _customerRepository.GetCustomerById(customerId);
 
 			if (customer == null)
 				throw new InvalidOperationException($"Customer Id {customerId} does not exists");
@@ -34,20 +34,24 @@ namespace ProvaPub.Services
 
 		public async Task<bool> CanPurchase(int customerId, decimal purchaseValue)
 		{
-			if (purchaseValue <= 0) throw new ArgumentOutOfRangeException(nameof(purchaseValue));
+			if (customerId <= 0)
+				throw new ArgumentOutOfRangeException(nameof(customerId));
+
+			if (purchaseValue <= 0)
+				throw new ArgumentOutOfRangeException(nameof(purchaseValue));
 
 			await GetCustomerById(customerId);
 
-			var baseDate = DateTime.UtcNow.AddMonths(-1);
-			var ordersInThisMonth = await _ctx.Orders.CountAsync(s => s.CustomerId == customerId && s.OrderDate >= baseDate);
-			if (ordersInThisMonth > 0)
+			var now = _dateTimeProvider.UtcNow;
+			var baseDate = now.AddMonths(-1);
+
+			if (await _customerRepository.HasPurchasedSince(customerId, baseDate))
 				return false;
 
-			var haveBoughtBefore = await _ctx.Customers.CountAsync(s => s.Id == customerId && s.Orders.Any());
-			if (haveBoughtBefore == 0 && purchaseValue > 100)
+			if (!await _customerRepository.HasPurchasedBefore(customerId) && purchaseValue > 100)
 				return false;
 
-			if (DateTime.UtcNow.Hour < 8 || DateTime.UtcNow.Hour > 18 || DateTime.UtcNow.DayOfWeek == DayOfWeek.Saturday || DateTime.UtcNow.DayOfWeek == DayOfWeek.Sunday)
+			if (now.Hour < 8 || now.Hour > 18 || now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
 				return false;
 
 			return true;

@@ -1,5 +1,5 @@
 using ProvaPub.Models;
-using ProvaPub.Repository;
+using ProvaPub.Infra;
 
 namespace ProvaPub.Services
 {

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using ProvaPub.Infra;
 using ProvaPub.Models;
-using ProvaPub.Repository;
 using System.Security.Cryptography;
 
 namespace ProvaPub.Services

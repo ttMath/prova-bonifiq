@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ProvaPub.Repository;
+using ProvaPub.Infra;
 
 namespace ProvaPub.Services
 {

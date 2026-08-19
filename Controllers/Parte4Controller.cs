@@ -15,9 +15,9 @@ namespace ProvaPub.Controllers
 	[Route("[controller]")]
 	public class Parte4Controller : ControllerBase
 	{
-		private readonly CustomerService _customerService;
+		private readonly ICustomerService _customerService;
 
-		public Parte4Controller(CustomerService customerService)
+		public Parte4Controller(ICustomerService customerService)
 		{
 			_customerService = customerService;
 		}

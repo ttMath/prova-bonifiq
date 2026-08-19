@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using ProvaPub.Infra;
 using ProvaPub.Models;
-using ProvaPub.Repository;
 using ProvaPub.Services.Payments;
 
 namespace ProvaPub.Services
@@ -8,13 +8,13 @@ namespace ProvaPub.Services
 	public class OrderService
 	{
 		private readonly TestDbContext _ctx;
-		private readonly CustomerService _customerService;
+		private readonly ICustomerService _customerService;
 		private readonly IEnumerable<IPaymentProcessor> _paymentProcessors;
 		private readonly BrazilianDateTimeService _brazilianDateTimeService;
 
 		public OrderService(
 			TestDbContext ctx,
-			CustomerService customerService,
+			ICustomerService customerService,
 			IEnumerable<IPaymentProcessor> paymentProcessors,
 			BrazilianDateTimeService brazilianDateTimeService)
 		{

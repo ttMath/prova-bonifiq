@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using ProvaPub.Repository;
+using ProvaPub.Infra;
+using ProvaPub.Repositories;
+using ProvaPub.Repositories.Interfaces;
 using ProvaPub.Services;
 using ProvaPub.Services.Payments;
 
@@ -16,7 +18,9 @@ builder.Services.AddDbContext<TestDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("ctx")));
 builder.Services.AddScoped<RandomService>();
 builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IDateTimeProvider, DateTimeProvider>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<BrazilianDateTimeService>();
 foreach (var paymentProcessor in typeof(IPaymentProcessor).Assembly.GetTypes()

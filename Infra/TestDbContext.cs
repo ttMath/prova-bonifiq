@@ -4,7 +4,7 @@ using ProvaPub.Models;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
-namespace ProvaPub.Repository
+namespace ProvaPub.Infra
 {
 
 	public class TestDbContext : DbContext
